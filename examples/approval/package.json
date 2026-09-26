@@ -1,0 +1,10 @@
+{
+  "name": "@trigora/example-approval-python",
+  "private": true,
+  "scripts": {
+    "dev": "trigora dev"
+  },
+  "devDependencies": {
+    "trigora": "link:../../../trigora/packages/cli"
+  }
+}
