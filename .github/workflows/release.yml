@@ -1,0 +1,35 @@
+name: release
+
+on:
+  push:
+    tags: ["v1.0.0"]
+
+jobs:
+  package:
+    uses: ./.github/workflows/package.yml
+
+  publish:
+    needs: package
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: trigora-python-0.9.0
+          path: dist
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Publish wheels
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          test -n "$TWINE_PASSWORD"
+          python -m pip install twine
+          twine upload dist/trigora_client-*.whl
+          twine upload dist/trigora-*.whl
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

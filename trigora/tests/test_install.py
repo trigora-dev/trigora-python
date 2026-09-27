@@ -230,5 +230,95 @@ class LocalInstallTests(unittest.TestCase):
             self.assertEqual(check.returncode, 0, check.stderr)
 
 
+    def test_release_directory_of_real_wheels(self) -> None:
+        wheels = os.environ.get("TRIGORA_RELEASE_WHEELS")
+        if not wheels:
+            self.skipTest("TRIGORA_RELEASE_WHEELS is unset")
+        directory = Path(wheels)
+        self.assertTrue(next(directory.glob("tcc_engine-*.whl"), None), directory)
+        self.assertTrue(next(directory.glob("trigora_cli-*.whl"), None), directory)
+        self.assertTrue(next(directory.glob("trigora-0*.whl"), None), directory)
+        self.assertTrue(next(directory.glob("trigora_client-*.whl"), None), directory)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            install = root / "install"
+            subprocess.run([sys.executable, "-m", "venv", str(install)], check=True)
+            pip_install = venv_python(install).parent / ("pip.exe" if os.name == "nt" else "pip")
+            isolated = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
+            result = subprocess.run(
+                [
+                    str(pip_install),
+                    "install",
+                    "--no-index",
+                    "--find-links",
+                    str(directory),
+                    "trigora==0.9.0",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=isolated,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            check = subprocess.run(
+                [
+                    str(venv_python(install)),
+                    "-c",
+                    "import trigora, trigora_cli\n",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=isolated,
+            )
+            self.assertEqual(check.returncode, 0, check.stderr)
+            version = subprocess.run(
+                [str(venv_trigora(install)), "--version"],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=isolated,
+            )
+            self.assertEqual(version.returncode, 0, version.stderr)
+            self.assertIn("0.9.0", version.stdout + version.stderr)
+            client = root / "client"
+            subprocess.run([sys.executable, "-m", "venv", str(client)], check=True)
+            client_pip = venv_python(client).parent / ("pip.exe" if os.name == "nt" else "pip")
+            client_install = subprocess.run(
+                [
+                    str(client_pip),
+                    "install",
+                    "--no-index",
+                    "--find-links",
+                    str(directory),
+                    "trigora-client==0.9.0",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=isolated,
+            )
+            self.assertEqual(client_install.returncode, 0, client_install.stderr)
+            isolated_check = subprocess.run(
+                [
+                    str(venv_python(client)),
+                    "-c",
+                    (
+                        "import trigora_client\n"
+                        "import importlib.util as u\n"
+                        "assert u.find_spec('trigora') is None\n"
+                        "assert u.find_spec('trigora_cli') is None\n"
+                        "assert u.find_spec('tcc_engine') is None\n"
+                    ),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                env=isolated,
+                cwd=client,
+            )
+            self.assertEqual(isolated_check.returncode, 0, isolated_check.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
