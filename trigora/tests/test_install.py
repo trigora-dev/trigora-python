@@ -107,7 +107,7 @@ class LocalInstallTests(unittest.TestCase):
                 wheel(pip, source, wheels)
                 wheel(pip, PACKAGE, wheels)
                 cli_wheel = next(wheels.glob("trigora_cli-*.whl"))
-                authoring_wheel = next(wheels.glob("trigora-0.9.0-*.whl"))
+                authoring_wheel = next(wheels.glob("trigora-1.0.0-*.whl"))
                 self.assertNotIn("none-any", cli_wheel.name)
                 self.assertIn("py3-none-any", authoring_wheel.name)
 
@@ -126,7 +126,7 @@ class LocalInstallTests(unittest.TestCase):
                         "--no-index",
                         "--find-links",
                         str(wheels),
-                        "trigora==0.9.0",
+                        "trigora==1.0.0",
                     ],
                     check=False,
                     capture_output=True,
@@ -202,7 +202,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(wheels),
-                    "trigora-client==0.9.0",
+                    "trigora-client==1.0.0",
                 ],
                 check=False,
                 capture_output=True,
@@ -252,7 +252,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(directory),
-                    "trigora==0.9.0",
+                    "trigora==1.0.0",
                 ],
                 check=False,
                 capture_output=True,
@@ -280,7 +280,7 @@ class LocalInstallTests(unittest.TestCase):
                 env=isolated,
             )
             self.assertEqual(version.returncode, 0, version.stderr)
-            self.assertIn("0.9.0", version.stdout + version.stderr)
+            self.assertIn("1.0.0", version.stdout + version.stderr)
             client = root / "client"
             subprocess.run([sys.executable, "-m", "venv", str(client)], check=True)
             client_pip = venv_python(client).parent / ("pip.exe" if os.name == "nt" else "pip")
@@ -291,7 +291,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(directory),
-                    "trigora-client==0.9.0",
+                    "trigora-client==1.0.0",
                 ],
                 check=False,
                 capture_output=True,
