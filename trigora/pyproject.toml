@@ -14,7 +14,7 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
 ]
-dependencies = ["tcc-engine==0.1.0", "trigora-cli==1.0.0"]
+dependencies = ["tcc-engine==26.10.0", "trigora-cli==1.0.0"]
 
 [project.urls]
 Homepage = "https://trigora.dev"
