@@ -8,27 +8,48 @@ jobs:
   package:
     uses: ./.github/workflows/package.yml
 
-  publish:
+  publish-client:
     needs: package
     runs-on: ubuntu-latest
     environment: release
+    permissions:
+      id-token: write
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: trigora-python-1.0.0
           path: dist
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - name: Publish wheels
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Stage the client wheel
         run: |
-          test -n "$TWINE_PASSWORD"
-          python -m pip install twine
-          twine upload dist/trigora_client-*.whl
-          twine upload dist/trigora-*.whl
+          mkdir -p client-dist
+          cp dist/trigora_client-*.whl client-dist/
+      - name: Publish trigora-client
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: client-dist/
+          attestations: false
+
+  publish:
+    needs: publish-client
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: trigora-python-1.0.0
+          path: dist
+      - name: Stage the trigora wheel
+        run: |
+          mkdir -p trigora-dist
+          cp dist/trigora-*.whl trigora-dist/
+      - name: Publish trigora
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: trigora-dist/
+          attestations: false
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
