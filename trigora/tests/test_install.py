@@ -52,14 +52,14 @@ def write_engine_stub(root: Path) -> None:
 
             [project]
             name = "tcc-engine"
-            version = "26.10.0"
+            version = "26.10.2"
 
             [tool.setuptools.packages.find]
             where = ["src"]
             """
         )
     )
-    (package / "__init__.py").write_text('PACKAGE_VERSION = "26.10.0"\n')
+    (package / "__init__.py").write_text('PACKAGE_VERSION = "26.10.2"\n')
 
 
 def venv_python(venv: Path) -> Path:
