@@ -71,26 +71,6 @@ Python client for the Trigora Cloud API.
 
 Native Trigora CLI distributed through PyPI.
 
-## How it fits together
-
-```text
-Python source
-     │
-     ▼
-   trigora
-     │
-     ▼
-TCC Python frontend
-     │
-     ▼
- TCC artifact
-     │
-     ▼
-Trigora runtime
-```
-
-TypeScript and Rust compile to the same execution model.
-
 ## Ecosystem
 
 - [Trigora](https://github.com/trigora-dev/trigora)
