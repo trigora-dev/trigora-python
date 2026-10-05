@@ -1,16 +1,104 @@
 # trigora-client
 
-Python client for starting and controlling Trigora executions. Import it as `trigora_client`.
+Python client for starting and controlling Trigora durable executions.
+
+Use the same API locally with `trigora dev` or remotely with Trigora Cloud.
+
+## Install
+
+```bash
+pip install trigora-client
+```
+
+## Quick example
 
 ```python
 from trigora_client import Client
 
 client = Client()
-run = client.executions.start("approval", {})
+
+run = client.executions.start("approval", {"request": "example"})
 run.send("approved", "ok")
-print(run.result())
+result = run.result()
+
+print(result)
 ```
 
-`Client()` uses `TRIGORA_TOKEN` to talk to Trigora Cloud (`TRIGORA_API_BASE_URL`, default `https://api.trigora.dev`). Without a token it uses the local runtime (`TRIGORA_RUNTIME_URL`, default `http://127.0.0.1:3477`).
+## Local and Cloud
 
-The same client can call `whoami`, `projects`, `deploy`, and `programs`, including `programs.versions`. Triggers are configured in `trigora.toml` and deployed with the Trigora CLI. They are not SDK or client APIs.
+By default, the client connects to the local runtime started by `trigora dev`.
+
+```python
+client = Client()
+```
+
+To connect to Trigora Cloud:
+
+```python
+client = Client(remote=True)
+```
+
+Cloud requires a token. You can pass one directly or set `TRIGORA_TOKEN`.
+
+```python
+import os
+
+client = Client(remote=True, token=os.environ["TRIGORA_TOKEN"])
+```
+
+You can also connect to a custom endpoint:
+
+```python
+client = Client(url="http://127.0.0.1:3477")
+```
+
+Endpoint defaults:
+
+- Local runtime: `TRIGORA_RUNTIME_URL` or `http://127.0.0.1:3477`
+- Trigora Cloud: `TRIGORA_API_BASE_URL` or `https://api.trigora.dev`
+
+An explicit `url` overrides the default endpoint. An explicit `token` is sent with requests to that endpoint.
+
+## API
+
+Workspace and project operations:
+
+- `whoami()`
+- `projects.list()`
+- `projects.create()`
+
+Programs:
+
+- `deploy()`
+- `programs.list()`
+- `programs.get()`
+- `programs.versions()`
+
+Executions:
+
+- `executions.start(program, input)`
+- `executions.list()`
+- `executions.get(id)`
+
+Execution handle:
+
+- `run.id`
+- `run.send(event, payload)`
+- `run.cancel()`
+- `run.result()`
+
+`programs.list`, `programs.versions`, and `executions.list` accept optional `limit` and `cursor` arguments.
+
+`program` is a program id string.
+
+`event` is an event name string.
+
+## Learn more
+
+- [Trigora documentation](https://trigora.dev/docs)
+- [Client documentation](https://trigora.dev/docs/client)
+- [Trigora Cloud](https://cloud.trigora.dev)
+
+## License
+
+MIT © 2026 Trigora, Inc.

@@ -20,12 +20,29 @@ class TrigoraError(RuntimeError):
         self.code = code
 
 
-def _base_url(url: str | None, token: str | None) -> str:
+def _present(value: str | None) -> str | None:
+    if value is None:
+        return None
+    trimmed = value.strip()
+    return trimmed or None
+
+
+def _env_url(name: str, fallback: str) -> str:
+    return (_present(os.environ.get(name)) or fallback).rstrip("/")
+
+
+def _resolve(
+    url: str | None, token: str | None, remote: bool
+) -> tuple[str, str | None, bool]:
+    explicit_token = _present(token)
     if url:
-        return url.rstrip("/")
-    if token:
-        return (os.environ.get("TRIGORA_API_BASE_URL") or DEFAULT_CLOUD_API_URL).rstrip("/")
-    return (os.environ.get("TRIGORA_RUNTIME_URL") or DEFAULT_RUNTIME_URL).rstrip("/")
+        return url.rstrip("/"), explicit_token, False
+    if remote:
+        resolved = explicit_token or _present(os.environ.get("TRIGORA_TOKEN"))
+        if not resolved:
+            raise TrigoraError("TRIGORA_TOKEN is not set.")
+        return _env_url("TRIGORA_API_BASE_URL", DEFAULT_CLOUD_API_URL), resolved, True
+    return _env_url("TRIGORA_RUNTIME_URL", DEFAULT_RUNTIME_URL), explicit_token, False
 
 
 class Client:
@@ -33,14 +50,14 @@ class Client:
         self,
         *,
         url: str | None = None,
+        remote: bool = False,
         token: str | None = None,
         project_id: str | None = None,
     ) -> None:
-        resolved_token = (
-            token if token is not None else os.environ.get("TRIGORA_TOKEN", "").strip() or None
-        )
-        self.url = _base_url(url, resolved_token)
+        resolved_url, resolved_token, cloud = _resolve(url, token, remote)
+        self.url = resolved_url
         self.token = resolved_token
+        self.cloud = cloud
         self.project_id = project_id
         self.projects = Projects(self)
         self.programs = Programs(self)
@@ -87,10 +104,14 @@ class Client:
                 pass
             raise TrigoraError(message, status=error.code or 0, code=code) from error
         except urllib.error.URLError as error:
-            raise TrigoraError(
-                f"Could not reach Trigora at {target}. {error.reason}",
-                status=0,
-            ) from error
+            if self.cloud:
+                message = f"Could not reach Trigora Cloud at {target}. {error.reason}"
+            else:
+                message = (
+                    f"Could not reach the local Trigora runtime at {target}. "
+                    f"Is `trigora dev` running? {error.reason}"
+                )
+            raise TrigoraError(message, status=0) from error
 
 
 class Projects:
@@ -187,9 +208,14 @@ class ExecutionHandle:
 
 
 def start(
-    program_id: str, input: Any | None = None, *, url: str | None = None, token: str | None = None
+    program_id: str,
+    input: Any | None = None,
+    *,
+    url: str | None = None,
+    remote: bool = False,
+    token: str | None = None,
 ) -> ExecutionHandle:
-    return Client(url=url, token=token).executions.start(program_id, input)
+    return Client(url=url, remote=remote, token=token).executions.start(program_id, input)
 
 
 def _page(limit: int | None, cursor: str | None) -> dict[str, str] | None:
