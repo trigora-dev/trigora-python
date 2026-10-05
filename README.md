@@ -17,7 +17,7 @@ Requires Python 3.10+.
 ## Install
 
 ```sh
-pip install trigora trigora-client trigora-cli
+pip install trigora trigora-client
 ```
 
 - `trigora` — Python authoring package
