@@ -31,9 +31,7 @@ def _env_url(name: str, fallback: str) -> str:
     return (_present(os.environ.get(name)) or fallback).rstrip("/")
 
 
-def _resolve(
-    url: str | None, token: str | None, remote: bool
-) -> tuple[str, str | None, bool]:
+def _resolve(url: str | None, token: str | None, remote: bool) -> tuple[str, str | None, bool]:
     explicit_token = _present(token)
     if url:
         return url.rstrip("/"), explicit_token, False

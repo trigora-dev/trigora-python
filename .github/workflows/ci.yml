@@ -16,15 +16,14 @@ jobs:
       - run: pip install ruff setuptools wheel
       - run: ruff check .
       - run: ruff format --check .
-      - uses: actions/checkout@v5
-        with:
-          repository: trigora-dev/trigora
-          path: sibling-trigora
+      - run: pip install tcc-engine==26.10.2
+      - run: PYTHONPATH=src python3 tests/test_compile.py
+        working-directory: trigora
       - run: PYTHONPATH=src python3 tests/test_sdk.py
         working-directory: trigora
       - run: PYTHONPATH=src python3 tests/test_package.py
         working-directory: trigora
-      - run: TRIGORA_CLI_SRC="$GITHUB_WORKSPACE/sibling-trigora/python/trigora-cli" PYTHONPATH=src python3 tests/test_install.py
+      - run: PYTHONPATH=src python3 tests/test_install.py
         working-directory: trigora
       - run: PYTHONPATH=src python3 tests/test_client.py
         working-directory: trigora-client

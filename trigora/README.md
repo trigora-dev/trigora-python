@@ -45,7 +45,7 @@ Each matching file has one `@program` async function. That function is the progr
 ```python
 @program
 async def research(topic, depth="full"):
-    ...
+    return {"topic": topic, "depth": depth}
 ```
 
 The Python frontend implements `py.subset.v1`.

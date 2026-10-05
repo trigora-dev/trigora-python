@@ -5,6 +5,6 @@
     "dev": "trigora dev"
   },
   "devDependencies": {
-    "trigora": "link:../../../trigora/packages/cli"
+    "trigora": "1.0.0"
   }
 }

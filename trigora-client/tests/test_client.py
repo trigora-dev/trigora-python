@@ -5,12 +5,13 @@ import os
 import threading
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import ClassVar
 
 from trigora_client import Client, TrigoraError, start
 
 
 class Handler(BaseHTTPRequestHandler):
-    requests: list[dict[str, str | None]] = []
+    requests: ClassVar[list[dict[str, str | None]]] = []
 
     def do_GET(self) -> None:
         self.requests.append(

@@ -1,7 +1,7 @@
 # Approval
 
 ```bash
-pip install -e ../../../trigora/python/trigora-cli -e ../../trigora -e ../../trigora-client
+pip install -e ../../trigora -e ../../trigora-client
 pnpm install
 pnpm dev
 ```
