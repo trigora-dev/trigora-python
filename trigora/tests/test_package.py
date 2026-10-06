@@ -56,7 +56,7 @@ class PackageBoundaryTests(unittest.TestCase):
         self.assertFalse(any("_vendor/" in name for name in names), names)
         metadata = metadata_text(wheel)
         self.assertIn("Requires-Dist: tcc-engine==26.10.2", metadata)
-        self.assertIn("Requires-Python: <3.13,>=3.10", metadata)
+        self.assertIn("Requires-Python: <3.15,>=3.10", metadata)
         self.assertIn("Requires-Dist: trigora-cli<2,>=1.0.2", metadata)
 
     def test_client_wheel_has_no_cli_or_compiler(self) -> None:
