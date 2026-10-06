@@ -16,7 +16,7 @@ jobs:
       - run: pip install ruff setuptools wheel
       - run: ruff check .
       - run: ruff format --check .
-      - run: pip install tcc-engine==26.10.2
+      - run: pip install tcc-engine==26.10.3
       - run: PYTHONPATH=src python3 tests/test_compile.py
         working-directory: trigora
       - run: PYTHONPATH=src python3 tests/test_sdk.py
