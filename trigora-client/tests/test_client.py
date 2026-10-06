@@ -12,11 +12,14 @@ from trigora_client import Client, TrigoraError, start
 
 class Handler(BaseHTTPRequestHandler):
     requests: ClassVar[list[dict[str, str | None]]] = []
+    posts: ClassVar[list[dict]] = []
+    user_agents: ClassVar[list[str | None]] = []
 
     def do_GET(self) -> None:
         self.requests.append(
             {"path": self.path.split("?", 1)[0], "authorization": self.headers.get("Authorization")}
         )
+        self.user_agents.append(self.headers.get("User-Agent"))
         if self.path == "/v1/whoami":
             self._json(200, {"actorType": "api_token"})
             return
@@ -35,6 +38,8 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length).decode("utf-8")
         body = json.loads(raw) if raw else {}
+        self.posts.append(body)
+        self.user_agents.append(self.headers.get("User-Agent"))
         if self.path == "/v1/executions":
             self._json(200, {"execution": {"id": "exec_1", "programId": body["programId"]}})
             return
@@ -69,6 +74,14 @@ class ClientTests(unittest.TestCase):
         cls.server.shutdown()
         cls.thread.join(timeout=2)
 
+    def test_omitted_input_is_an_empty_argument_list(self) -> None:
+        Handler.posts.clear()
+        Handler.user_agents.clear()
+        run = start("approval", url=self.url)
+        self.assertEqual(run.id, "exec_1")
+        self.assertEqual(Handler.posts[-1]["input"], [])
+        self.assertEqual(Handler.user_agents[-1], "trigora-client/1.0.1")
+
     def test_start_send_and_result(self) -> None:
         run = start("approval", {"n": 1}, url=self.url)
         self.assertEqual(run.id, "exec_1")
@@ -76,8 +89,10 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(run.result(), {"ok": True})
 
     def test_whoami(self) -> None:
+        Handler.user_agents.clear()
         client = Client(url=self.url)
         self.assertEqual(client.whoami()["actorType"], "api_token")
+        self.assertEqual(Handler.user_agents[-1], "trigora-client/1.0.1")
 
     def test_program_versions(self) -> None:
         client = Client(url=self.url)

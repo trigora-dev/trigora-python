@@ -4,17 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "trigora"
-version = "1.0.0"
+version = "1.0.1"
 description = "Authoring package for Trigora durable programs"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = { text = "MIT" }
 authors = [{ name = "Trigora" }]
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
 ]
-dependencies = ["tcc-engine==26.10.2", "trigora-cli==1.0.0"]
+dependencies = ["tcc-engine==26.10.2", "trigora-cli>=1.0.2,<2"]
 
 [project.urls]
 Homepage = "https://trigora.dev"

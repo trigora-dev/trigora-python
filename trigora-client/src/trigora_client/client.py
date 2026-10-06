@@ -10,6 +10,7 @@ from typing import Any
 
 DEFAULT_RUNTIME_URL = "http://127.0.0.1:3477"
 DEFAULT_CLOUD_API_URL = "https://api.trigora.dev"
+USER_AGENT = "trigora-client/1.0.1"
 _PROJECT_HEADER = "X-Trigora-Project-Id"
 
 
@@ -78,7 +79,7 @@ class Client:
         if query:
             target = f"{target}?{urllib.parse.urlencode(query)}"
         data = None if payload is None else json.dumps(payload).encode("utf-8")
-        headers = {"Accept": "application/json"}
+        headers = {"Accept": "application/json", "User-Agent": USER_AGENT}
         if payload is not None:
             headers["Content-Type"] = "application/json"
         if self.token:
@@ -151,7 +152,7 @@ class Executions:
         body = self._client._request(
             "POST",
             "/v1/executions",
-            {"programId": program_id, "input": {} if input is None else input},
+            {"programId": program_id, "input": [] if input is None else input},
         )
         return ExecutionHandle(self._client, body["execution"]["id"])
 

@@ -19,5 +19,5 @@ jobs:
         run: python trigora/tests/test_package.py
       - uses: actions/upload-artifact@v6
         with:
-          name: trigora-python-1.0.0
+          name: trigora-python-1.0.1
           path: dist/*

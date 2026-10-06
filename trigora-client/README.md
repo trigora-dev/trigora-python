@@ -76,7 +76,7 @@ Programs:
 
 Executions:
 
-- `executions.start(program, input)`
+- `executions.start(program, input=None)` — omitted input is `[]`; an explicit `{}` is one value
 - `executions.list()`
 - `executions.get(id)`
 

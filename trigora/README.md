@@ -1,6 +1,6 @@
 # trigora
 
-Python authoring SDK for Trigora durable programs.
+Python authoring SDK for Trigora durable programs. Requires CPython 3.10–3.12 until 3.13 wheels exist.
 
 Build long-running programs that can call external systems, wait for events, sleep durably, invoke child executions, and recover from committed continuation state.
 

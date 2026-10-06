@@ -12,7 +12,7 @@ Build long-lived agents and programs that survive waits, external effects, event
 
 Trigora uses **Transparent Continuation Checkpointing (TCC)** to resume from committed continuation state rather than replaying completed execution history.
 
-Requires Python 3.10+.
+Requires CPython 3.10–3.12 until 3.13 wheels exist.
 
 ## Install
 
