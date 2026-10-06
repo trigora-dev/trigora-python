@@ -48,7 +48,7 @@ class LocalInstallTests(unittest.TestCase):
             wheels.mkdir()
             pip = pip_bin(root)
             wheel(pip, PACKAGE, wheels)
-            authoring_wheel = next(wheels.glob("trigora-1.0.0-*.whl"))
+            authoring_wheel = next(wheels.glob("trigora-1.0.1-*.whl"))
             self.assertIn("py3-none-any", authoring_wheel.name)
 
             install = root / "install"
@@ -63,7 +63,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-cache-dir",
                     "--find-links",
                     str(wheels),
-                    "trigora==1.0.0",
+                    "trigora==1.0.1",
                 ],
                 check=False,
                 capture_output=True,
@@ -107,7 +107,7 @@ class LocalInstallTests(unittest.TestCase):
                 env=isolated,
             )
             self.assertEqual(version.returncode, 0, version.stderr)
-            self.assertIn("1.0.0", version.stdout + version.stderr)
+            self.assertIn("1.0.2", version.stdout + version.stderr)
 
     def test_client_install_has_no_cli(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -127,7 +127,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(wheels),
-                    "trigora-client==1.0.0",
+                    "trigora-client==1.0.1",
                 ],
                 check=False,
                 capture_output=True,
@@ -161,7 +161,7 @@ class LocalInstallTests(unittest.TestCase):
         directory = Path(wheels)
         self.assertTrue(next(directory.glob("tcc_engine-*.whl"), None), directory)
         self.assertTrue(next(directory.glob("trigora_cli-*.whl"), None), directory)
-        self.assertTrue(next(directory.glob("trigora-1.0.0-*.whl"), None), directory)
+        self.assertTrue(next(directory.glob("trigora-1.0.1-*.whl"), None), directory)
         self.assertTrue(next(directory.glob("trigora_client-*.whl"), None), directory)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -176,7 +176,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(directory),
-                    "trigora==1.0.0",
+                    "trigora==1.0.1",
                 ],
                 check=False,
                 capture_output=True,
@@ -204,7 +204,7 @@ class LocalInstallTests(unittest.TestCase):
                 env=isolated,
             )
             self.assertEqual(version.returncode, 0, version.stderr)
-            self.assertIn("1.0.0", version.stdout + version.stderr)
+            self.assertIn("1.0.2", version.stdout + version.stderr)
             client = root / "client"
             subprocess.run([sys.executable, "-m", "venv", str(client)], check=True)
             client_pip = venv_python(client).parent / ("pip.exe" if os.name == "nt" else "pip")
@@ -215,7 +215,7 @@ class LocalInstallTests(unittest.TestCase):
                     "--no-index",
                     "--find-links",
                     str(directory),
-                    "trigora-client==1.0.0",
+                    "trigora-client==1.0.1",
                 ],
                 check=False,
                 capture_output=True,
